@@ -33,37 +33,6 @@ cloudinary.config({
     api_secret: 'LI4FEC-4m-3Zaf10Yg2TO26wb_w' 
 });
 
-const SKIN_CLASSES = {
-    0: 'Actinic Keratoses (Solar Keratoses) or intraepithelial Carcinoma (Bowen’s disease)',
-    1: 'Basal Cell Carcinoma',
-    2: 'Benign Keratosis',
-    3: 'Dermatofibroma',
-    4: 'Melanoma',
-    5: 'Melanocytic Nevi',
-    6: 'Vascular skin lesion'
-};
-
-function findMedicine(pred) {
-    switch (pred) {
-        case 0:
-            return "fluorouracil";
-        case 1:
-            return "Aldara";
-        case 2:
-            return "Prescription Hydrogen Peroxide";
-        case 3:
-            return "fluorouracil";
-        case 4:
-            return "fluorouracil (5-FU)";
-        case 5:
-            return "fluorouracil";
-        case 6:
-            return "fluorouracil";
-        default:
-            return "Unknown";
-    }
-}
-
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -77,33 +46,18 @@ app.post('/detect', upload.single('uploaded_file'), async (req, res) => {
             return res.status(500).json({ error: 'Error uploading image to Cloudinary' });
         }
 
-        const imageUrl = cloudinaryResponse.url;
-
-        // Set options for PythonShell
-        const options = {
-            mode: 'json',
-            pythonPath: '/usr/bin/python3', // Path to your Python executable
-            pythonOptions: ['-u'], // Allow unbuffered output
-            scriptPath: path.join(__dirname), // Path to the directory containing your Python script
-            args: [imageUrl] // Pass the image URL as an argument to the Python script
-        };
-
-        // Execute the Python script
-        PythonShell.run('skin_detection.py', options, (err, result) => {
-            if (err) {
-                console.error('Error executing Python script:', err);
-                return res.status(500).json({ error: 'Error processing image' });
-            }
-
-            // Handle the result returned by the Python script
-            console.log('Python script output:', result);
-            res.status(200).json(result);
-        });
-
-    } catch (error) {
-        console.error(`Error processing image: ${error}`);
+        // Redirect to new route with the Cloudinary URL
+        res.redirect(`/show-image?url=${cloudinaryResponse.url}`);
+    } catch(err) {
+        console.error(err);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+// Route to render the uploaded image
+app.get('/show-image', (req, res) => {
+    const imageUrl = req.query.url;
+    res.render('image', { imageUrl });
 });
 
 app.listen(PORT, () => {
