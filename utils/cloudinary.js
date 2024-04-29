@@ -2,9 +2,9 @@ const cloudinary = require("cloudinary").v2;
 const { unlinkSync } = require("fs");
 
 cloudinary.config({ 
-    cloud_name: 'dhbd74kyg', 
-    api_key: '262952965323451', 
-    api_secret: 'LI4FEC-4m-3Zaf10Yg2TO26wb_w' 
+    cloud_name: , 
+    api_key: , 
+    api_secret: 
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
